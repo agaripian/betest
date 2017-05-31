@@ -13,11 +13,6 @@ use Slim\Http\Response;
 
 class AddImage extends Action\AbstractImpl
 {
-
-    public function __construct($app) {
-        $this->app = $app;
-    }
-
     /**
      * @param Request $request
      * @param Response $response
@@ -31,7 +26,7 @@ class AddImage extends Action\AbstractImpl
         $user = User::query()->findOrFail($args['id']);
 
         //Check to see if user is authorized to add an image
-        if ($user->id !== $this->app->user[0]->id) {
+        if ($user->id !== $request->getAttribute('user')->id) {
             return $response
                 ->withStatus(401)
                 ->write('Not Authorized');

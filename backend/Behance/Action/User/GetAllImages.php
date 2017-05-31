@@ -11,10 +11,6 @@ use Slim\Http\Response;
 
 class GetAllImages extends Action\AbstractImpl
 {
-    public function __construct($app) {
-        $this->app = $app;
-    }
-
     /**
      * @param Request $request
      * @param Response $response
@@ -23,13 +19,7 @@ class GetAllImages extends Action\AbstractImpl
      */
     public function run(Request $request, Response $response, array $args) : Response
     {
-       $user_id = intval($args['id']);
-        //Check to see if user is authorized to add an image
-        if ($user_id !== $this->app->user[0]->id) {
-            return $response
-                ->withStatus(401)
-                ->write('Not Authorized');
-        }
+        $user_id = intval($args['id']);
 
         /** @noinspection PhpUndefinedMethodInspection */
         $builder = Image::query()->where('userid', '=', $user_id);

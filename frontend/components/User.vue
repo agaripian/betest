@@ -1,7 +1,7 @@
 <template>
   <div class="ev-login col-sm-4 offset-sm-4">
     <div>User Profile - User Id: {{userId}}</div>
-    <AddImage @save="addImage"> </AddImage>
+    <AddImage v-if="isOwner" @save="addImage"> </AddImage>
     <spinner v-show="loading" message="Loading..."></spinner>
     <div class="alert alert-danger" v-if="error">
       <p>{{ error }}</p>
@@ -18,6 +18,7 @@ import Spinner from '@/components/common/Spinner';
 import Beimage from '@/components/Beimage';
 import AddImage from '@/components/AddImage';
 import services from '@/api/services';
+import cookie from '@/utils/cookie';
 
 export default {
   name: 'user',
@@ -36,6 +37,15 @@ export default {
     // fetch the data when the view is created and the data is
     // already being observed
     this.fetchData();
+  },
+
+  computed: {
+    isOwner() {
+      if (parseInt(this.userId, 10) === parseInt(cookie.getCookie('user_id'), 10)) {
+        return true;
+      }
+      return false;
+    },
   },
 
   watch: {

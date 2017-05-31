@@ -28,7 +28,9 @@
     >
       Login
     </button>
-    <br><br><br>
+    <br><br>
+    <a href="#user/1">View Bob's Gallery</a> - <a href="#user/2">View John's Gallery</a>
+    <br><br>
     <a href="#">Forgot your password?</a><br>
     Don’t have an account? &nbsp;<a href="#signup">Sign up here.</a>
 
@@ -56,6 +58,7 @@ export default {
   methods: {
     submit() {
       cookie.deleteCookie('auth_token');
+      cookie.deleteCookie('user_id');
       this.error = '';
       this.loggingIn = true;
       const credentials = {
@@ -72,7 +75,8 @@ export default {
         }
         response.json().then((data) => {
           cookie.setCookie('auth_token', data.auth_token);
-          this.$router.push({ name: 'User', params: { userId: data.user_id } });
+          cookie.setCookie('user_id', data.user_id);
+          this.$router.push({ name: 'Profile', params: { userId: data.user_id } });
         });
       },
       () => {

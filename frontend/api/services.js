@@ -29,11 +29,11 @@ export default {
   },
 
   getAllImages(userId) {
-    return this.beFetch(`api/index.php/user/${userId}/getallimages`);
+    return this.beFetch(`api/index.php/public/user/${userId}/getallimages`);
   },
 
   addImage(userId, image) {
-    return this.beFetch(`api/index.php/user/${userId}/addimage`, {
+    return this.beFetch(`api/index.php/protected/user/${userId}/addimage`, {
       method: 'POST',
       body: JSON.stringify(image),
     });

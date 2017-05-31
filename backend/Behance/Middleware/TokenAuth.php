@@ -7,7 +7,7 @@ use Slim\Http\Response;
 use Behance\Model\User;
 
 class TokenAuth {
-    const WHITELIST = ['\/auth'];
+    const WHITELIST = ['\/public','\/auth'];
 
     public function __construct($app) {
         $this->app = $app;
@@ -19,12 +19,14 @@ class TokenAuth {
      * @param string $auth_token
      * @return bool
      */
-    public function authenticate_and_set_user($auth_token) {
-       $this->user = $this->app->user = User::query()->where('token', '=', $auth_token)->get();
-       if (isset($this->user[0])) {
-           return true;
-       }
-       return false;
+    public function authenticate_and_set_user($request) {
+      $auth_token = $request->getHeader('auth_token');
+      $user = User::query()->where('token', '=', $auth_token)->get();
+      if (isset($user[0])) {
+          $this->user = $user[0];
+          return true;
+      }
+      return false;
     }
 
     /**
@@ -36,23 +38,20 @@ class TokenAuth {
      */
     public function isPublicUrl($url) {
         $patterns_flattened = implode('|', self::WHITELIST);
-       // var_dump($patterns_flattened); die();
         $matches = null;
         preg_match('/' . $patterns_flattened . '/', $url, $matches);
         return (count($matches) > 0);
     }
 
     public function __invoke(Request $request, Response $response, $next) {
-        //Get the token sent from jquery
-        $auth_token = $request->getHeader('auth_token');
         //We can check if the url requested is public or protected
         if ($this->isPublicUrl($request->getUri())) {
             //if public, then we just call the next middleware and continue execution normally
             return $next($request, $response);
         } else {
             //If protected url, we check if our token is valid and set the user
-            if ($request->hasHeader('auth_token') && $this->authenticate_and_set_user($request->getHeader('auth_token')[0])) {
-                return $next($request, $response);
+            if ($request->hasHeader('auth_token') && $this->authenticate_and_set_user($request)) {
+                return $next($request->withAttribute('user', $this->user), $response);
             } else {
                 return $response
                     ->withStatus(403)

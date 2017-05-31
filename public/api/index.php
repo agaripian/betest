@@ -73,10 +73,14 @@ $app = new \Slim\App($container);
 $app->add(new \Behance\Middleware\TokenAuth($app));
 
 // routing
-$app->group('/user', function () {
+$app->group('/protected', function () {
     /* @var \Slim\App $this */
-    $this->post('/{id:\d+}/addimage', new \Behance\Action\User\AddImage($this));
-    $this->get('/{id:\d+}/getallimages', new \Behance\Action\User\GetAllImages($this));
+    $this->post('/user/{id:\d+}/addimage', \Behance\Action\User\AddImage::class);
+});
+
+$app->group('/public', function () {
+    /* @var \Slim\App $this */
+    $this->get('/user/{id:\d+}/getallimages', \Behance\Action\User\GetAllImages::class);
 });
 
 $app->group('/auth', function () {
